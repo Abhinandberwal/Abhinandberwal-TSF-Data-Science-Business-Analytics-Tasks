@@ -1,0 +1,20 @@
+Task:Perform ‘Exploratory Data Analysis’ on dataset ‘Indian Premier League’
+
+Problem statement:
+
+1. Most successful teams based on no:
+	-Most of wins,
+	-The team wins by batting first,
+	-Win by largest margin of runs,
+	-Narrowest win margin (by 1 run),
+	-In most matches, the team wins by bowling first,
+	-Teams with most win by wickets margin(TOP 10),
+	-Narrowest win margins (by wickets) and
+	-Teams scoring highest runs in a match.
+
+2. Most successful players based On:
+	-Batsman Record,
+	-Bowler Record,
+	-Batsman vs Bowler Record.
+
+3. Factors affecting the result of matches such as winning toss: 

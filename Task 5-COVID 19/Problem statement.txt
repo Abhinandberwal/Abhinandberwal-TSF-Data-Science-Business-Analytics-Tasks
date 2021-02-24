@@ -1,0 +1,5 @@
+Task:  Create a storyboard showing spread of Covid-19 cases in your country or any region (Asia, Europe, BRICS etc).
+
+Problem statement: 
+1) Use animation, timeline and annotations to create attractive and interactive dashboards and story.
+2) Identify interesting patterns and possible reasons helping Covid-19 spread with basic as well as advanced charts.

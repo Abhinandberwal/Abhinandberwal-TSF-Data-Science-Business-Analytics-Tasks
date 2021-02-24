@@ -1,0 +1,809 @@
+---
+- <h1><center><font color=blue>Title:"Exploratory Data Analysis - Retail"</font></center></h1>
+  <h5 style="text-align:right;">- Abhinand </h5> <h4 style="text-align:right;">GRIP-The
+  Spark Foundation</h4> <h4 style="text-align:right;">Data Science and Business Analytics</h4>
+---
+  
+  
+<h4>Task:Perform 'Exploratory Data Analysis' on dataset 'SampleSuperstore'</h4>
+  
+<h4>Problem statement:</h4>
+
+<h5>1. As a business manager, try to find out the weak areas where you can work to make more profit.</h5>
+<h5>2. What all business problems you can derive by exploring the data? <h5>
+
+
+**load our R Packages that we will use here.**
+<br>
+```{r message=FALSE}
+library(tidyverse)
+library(DT)
+library(choroplethr)
+library(choroplethrMaps)
+```
+<br>
+```{r message=FALSE}
+Superstore= read.csv("SampleSuperstore.csv")
+```
+<br>
+<br>
+
+**Sales Analysis **
+<br>
+<br>
+**Statewise Sales Analysis**
+<br>
+```{r echo=TRUE}
+Statewise_Sales= Superstore %>%
+  group_by(State) %>% 
+  summarise(Total_Sales= sum(Sales)) %>%
+  arrange(desc(Total_Sales))
+datatable(Statewise_Sales)
+
+```
+
+<br>
+**Plotting Statewise Sales Analysis**
+
+<br>
+
+```{r fig.height=15, fig.width=15}
+ggplot(Statewise_Sales,aes(reorder(State,Total_Sales),Total_Sales,fill=State))+
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=3, color="black",alpha=0.07)+
+  scale_x_discrete(labels = Statewise_Sales[order(Statewise_Sales$Total_Sales),]$State) +
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(State,Total_Sales,label =Total_Sales))+
+  labs(x = "State", y = "Total Sales", title = "Statewise Sales Analysis")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+
+**Regionwise Sales Analysis**
+```{r echo=TRUE}
+Regionwise_Sales= Superstore %>%
+  group_by(Region) %>%
+  summarise(TotalS= sum(Sales)) %>%
+  arrange(desc(TotalS))
+datatable(Regionwise_Sales)
+```
+**Plotting Regionwise Sales Analysis**
+```{r fig.height=8, fig.width=15}
+ggplot(Regionwise_Sales,aes(reorder(Region,TotalS),TotalS,fill=Region))+
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=10, color="black",alpha=0.07)+
+  scale_x_discrete(labels = Regionwise_Sales[order(Regionwise_Sales$TotalS),]$Region) +
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(Region,TotalS,label =TotalS))+
+  labs(x = "Region", y = "Total Regionwise Sales", title = "Regionwise Analysis of Sales")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+**Geographic Plots of Statewise Sales Analysis**
+```{r}
+GSPlot= Superstore %>%
+  group_by(State) %>%
+  summarise(Total_Sales= sum(Sales)) %>%
+  arrange(desc(Total_Sales))
+datatable(GSPlot)
+```
+**Converting into a Geographic Plot**
+```{r echo=TRUE, message=TRUE}
+colnames(GSPlot)= c('region', 'value')
+GSPlot$region= tolower(GSPlot$region)
+```
+**we use here library(choroplethr) and library(choroplethrMaps) for map**
+<br>
+**Plots of Statewise Sales Analysis**
+```{r fig.height=5, fig.width=15, message=FALSE, warning=FALSE}
+state_choropleth(GSPlot,title= "Geographic Analysis of Sales",legend="Sales in USD")
+```
+
+
+<h4><b>Observations- </b></h4>
+<ul>
+  <li>State of California recorded the highest Sales, around 450,000 USD.</li>
+  <li>New York has the second highest Sales, around 300,000 USD.</li>
+  <li>States of Texas and Washington record the third and fourth highest sales, around 150,000 USD and 140,000 USD respectively.</li>
+  <li>North Dakota records the least Sales, around 1000 USD. </li>
+  <li>We can see from the geographic and regionwise plots that the company's Sales are mostly concentrated on the East and West Coast of America.</li>
+</ul>
+
+<br>
+**Profit Analysis**
+<br>
+
+**Statewise Profit Analysis**
+```{r}
+Statewise_Profit= Superstore %>%
+  group_by(State) %>% 
+  summarise(Total_Profit= sum(Profit)) %>%
+  arrange(desc(Total_Profit))
+datatable(Statewise_Profit)
+```
+<br>
+**Plotting Statewise Profit Analysis**
+```{r fig.height=15, fig.width=15}
+ggplot(Statewise_Profit, aes(x=State,y=Total_Profit,fill= State)) +
+  geom_col(width = 0.7, alpha = 0.5)+
+  geom_point(size=3, color="black",alpha=0.07)+
+  scale_x_discrete(labels = Statewise_Profit[order(Statewise_Profit$Total_Profit),]$State) +
+  coord_flip()+
+  geom_text(aes(State,Total_Profit,label =Total_Profit))+
+  labs(x = "State", y = "Total Profit", title = "Statewise Profit Analysis")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+**Regionwise Profit Analysis**
+```{r}
+Regionwise_Profit= Superstore %>%
+  group_by(Region) %>%
+  summarise(TotalP= sum(Profit)) %>%
+  arrange(desc(TotalP))
+datatable(Regionwise_Profit)
+```
+**Plotting Regionwise Profit Analysis**
+
+```{r fig.height=5, fig.width=10}
+ggplot(Regionwise_Profit, aes(x=Region,y=TotalP,fill= Region)) +
+  geom_col(width = 0.7, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  scale_x_discrete(labels = Regionwise_Profit[order(Regionwise_Profit$TotalP),]$Region) +
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(Region,TotalP,label =TotalP))+
+  labs(x = "Region", y = "Total Profit", title = "Statewise Profit Analysis")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Geographic Plots of Statewise Sales Analysis **
+```{r}
+GPPlot= Superstore %>%
+  group_by(State) %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  arrange(desc(Total_Profit))
+datatable(GPPlot)
+```
+
+**Converting into a Geographic Plot **
+```{r warning=FALSE}
+colnames(GPPlot)= c('region', 'value')
+GPPlot$region= tolower(GPPlot$region)
+```
+
+**Plotting Statewise Sales Analysis **
+```{r fig.height=6, fig.width=15, warning=FALSE}
+state_choropleth(GPPlot,title= "Geographic Analysis of Profit",legend="Profit in USD")
+```
+
+<h4><b>Observations- </b></h4>
+<ul>
+  <li>From the Statewise Profit Analysis, the States of New York, California and Washington recorded the most profits.</li>
+  <li>The State of Texas was the most unprofitable for the company causing severe losses.</li>
+</ul>
+
+**Doing some Statewise Profit/Sales Ratio Analysis **
+```{r}
+Profit_to_Sales= Superstore %>% 
+  group_by(State) %>%
+  summarise(Profit_Sales_Ratio= sum(Profit)/sum(Sales)) %>%
+  arrange(desc(Profit_Sales_Ratio))
+datatable(Profit_to_Sales)
+```
+
+**Plotting Statewise Profit/Sales Ratio Analysis **
+```{r fig.height=20, fig.width=15}
+ggplot(Profit_to_Sales, aes(x=State,y=Profit_Sales_Ratio,fill= State)) +
+  geom_bar(stat = "identity",width = 0.7, alpha = 0.5)+
+  geom_point(size=3, color="black",alpha=0.07)+
+  scale_x_discrete(labels = Profit_to_Sales[order(Profit_to_Sales$Profit_Sales_Ratio),]$State) +
+  coord_flip()+
+  geom_text(aes(State,Profit_Sales_Ratio,label =Profit_Sales_Ratio))+
+  labs(x = "State", y = "Total Profit", title = "Statewise Profit Analysis")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+<h4><b>Observations- </b></h4>
+<ul>
+  <li>Some Profit to Sales Ratio Analysis showed that Ohio had the worst Profit-Sales Ratio</li>
+  <li>We also understand that the states making the most profits, i.e, New York, California, and Washington do not show the maximum Profit-Sales ratio meaning that the company can improve its profits/sales in these states.</li>
+</ul>
+
+<br>
+**Sales and Profit Analysis Segmentwise**
+```{r}
+Profit_each_segment= Superstore %>%
+  group_by(Segment) %>%
+  summarise(Ratio= sum(Profit)/sum(Sales))%>%
+  arrange(desc(Ratio))
+datatable(Profit_each_segment)
+```
+**plotting Profit/Sales Ratio Plots for each segment**
+```{r fig.height=5, fig.width=10}
+ggplot(Profit_each_segment, aes(x=Segment,y=Ratio,fill= Segment)) +
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  scale_x_discrete(labels = Profit_each_segment[order(Profit_each_segment$Ratio),]$Segment) +
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(Segment,Ratio,label =Ratio))+
+  labs(x = "Segment", y = "Total Profit", title = "Statewise Profit Analysis")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+<h4><b>Observations- </b></h4>
+<ul>
+  <li>For the Home Office Segment the Profit/Sales Ratio is the highest.</li>
+  <li>There is scope for the company to improve its Profit/Sales ratio in the Consumer and Corporate Segment.</li>
+</ul>
+
+<br>
+
+<h4><b>We will choose the five different states and try to understand what kind of products are most profitable for our Analysis.</b></h4>
+<ul>
+  <li>California</li>
+  <li>New Jersey</li>
+  <li>Connecticut</li>
+  <li>Wisconsin</li>
+  <li>Colorado</li>
+</ul>
+
+<br>
+
+<h4><b>Office-Supplies</b></h4>
+**Profitable Office Supplies in California**
+```{r fig.height=7, fig.width=12}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Office Supplies" & State== "California" ) %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Sub Category", y = "Total Profit", title = "Profitable Office Supplies in California State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Profitable Office Supplies in New Jersey**
+```{r fig.height=7, fig.width=12}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Office Supplies" & State== "New Jersey" ) %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Sub Category", y = "Total Profit", title = "Profitable Office Supplies in New Jersey State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Profitable Office Supplies in Connecticut**
+```{r fig.height=7, fig.width=12}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Office Supplies" & State== "Connecticut" ) %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Sub Category", y = "Total Profit", title = "Profitable Office Supplies in Connecticut State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Profitable Office Supplies in Wisconsin**
+```{r fig.height=7, fig.width=12}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Office Supplies" & State== "Wisconsin" ) %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Sub Category", y = "Total Profit", title = "Profitable Office Supplies in Wisconsin State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+**Profitable Office Supplies in Colorado**
+
+```{r fig.height=10, fig.width=9}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Office Supplies" & State== "Colorado" ) %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Sub Category", y = "Total Profit", title = "Profitable Office Supplies in Colorado State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+
+
+<h4><b>similar graphs for Furniture and Technology Segment.</b></h4>
+<br>
+<br>
+<h4><b>Furnitures</b></h4>
+**Profitable Furnitures in California**
+```{r fig.height=5, fig.width=12}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Furniture" & State== "California") %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Furnitures", y = "Total Profit", title = "Profitable Furnitures in California State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Profitable Furnitures in New Jersey**
+
+```{r fig.height=5, fig.width=12}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Furniture" & State== "New Jersey") %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Furnitures", y = "Total Profit", title = "Profitable Furnitures in New Jersey State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Profitable Furnitures in Connecticut**
+```{r fig.height=5, fig.width=12}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Furniture" & State== "Connecticut") %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Furnitures", y = "Total Profit", title = "Profitable Furnitures in Connecticut State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Profitable Furnitures in Wisconsin**
+```{r fig.height=5, fig.width=12}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Furniture" & State== "Wisconsin") %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Furnitures", y = "Total Profit", title = "Profitable Furnitures in Wisconsin State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Profitable Furnitures in Colorado**
+```{r fig.height=5, fig.width=12} 
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Furniture" & State== "Colorado") %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Furnitures", y = "Total Profit", title = "Profitable Furnitures in Colorado State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+<br>
+<h4><b>Technology</b></h4>
+**Profitable Technology in California**
+```{r fig.height=4, fig.width=10}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Technology" & State== "California") %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Technology", y = "Total Profit", title = "Profitable Technology in California State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Profitable Technology in New Jersey**
+```{r fig.height=4, fig.width=10}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Technology" & State== "New Jersey") %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Technology", y = "Total Profit", title = "Profitable Technology in New Jersey State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Profitable Technology in Connecticut**
+```{r fig.height=3, fig.width=9}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Technology" & State== "Connecticut") %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Technology", y = "Total Profit", title = "Profitable Technology in Connecticut State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Profitable Technology in Wisconsin**
+```{r fig.height=3, fig.width=10}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Technology" & State== "Wisconsin") %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Technology", y = "Total Profit", title = "Profitable Technology in Wisconsin State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+**Profitable Technology in Colorado**
+
+```{r fig.height=5, fig.width=9}
+Superstore %>%
+  group_by(Sub.Category) %>% 
+  filter(Category== "Technology" & State== "Colorado") %>%
+  summarise(Total_Profit= sum(Profit)) %>%
+  ggplot(aes(x= Sub.Category,y=Total_Profit, fill= Sub.Category))+ 
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Technology", y = "Total Profit", title = "Profitable Technology in Colorado State")+
+  theme(axis.text = element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+
+
+<h4><b>Observations- </b></h4>
+<ul>
+  <li>In the State of California, in the Office Supplies segment,Binders and Paper are some of the most profitable products.In the Furniture Segment,Furnishings are the most profitable, whereas tables are a little un-profitable.In the technology segment, Accessories and Copiers are the most profitable products.</li>
+  <li>In New Jersey, in the Office Supplies segment, most profit comes from the Binders.In the Furniture Segment, Chairs are the most profitable with Tables accounting for loss.In the Technology segment, Machines are the most profitable products.</li>
+  <li>In the state of Connecticut, Appliances, Paper and Storage are the most profitable.Chairs being most profitable in the Furniture Segment, whereas phones are the most profitable in the Technology Segment.</li>
+  <li>In Winconsin, Appliances and Paper are the most profitable, in the Office-Supplies Segment, Chairs are most profitable in Furniture Segment, and Accessories are the most profitable in the Technology Segment. </li>
+  <li>In the State if Colorado, Binders, Supplies and Storage contribute to loss in the Office Supplies Segment, whereas Bookcases and tables account for losses in the Furniture Segment. Machines incur huge losses to the company in the state of Colorado.</li>
+</ul>
+<br>
+
+<br>
+<h4><b>Different Sub-Categories</b></h4>
+<br>
+**Price per product in different Sub-Categories**
+
+```{r}
+List=list()
+a=0
+for (j in Superstore) {
+  a= (Superstore$Sales)/(Superstore$Quantity)
+  List[[length(List)+1]]=a
+}
+Superstore=Superstore %>% mutate(Price_per_product=as.integer(paste(a)))
+```
+
+```{r}
+product_price=Superstore %>%
+  group_by(Sub.Category) %>%
+  summarise(Total_Profit= sum(Price_per_product))%>%
+  arrange(desc(Total_Profit))
+datatable(product_price)
+
+```
+
+```{r fig.height=8, fig.width=15}
+
+ggplot(product_price, aes(x= Sub.Category,y=Total_Profit,fill= Sub.Category))+
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  theme_classic()+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Profit,label =Total_Profit))+
+  labs(x = "Sub.Category", y = "Total Profit", title = "Price per product in different Sub-Categories")+
+  theme(axis.text= element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+
+
+
+```
+
+
+
+
+**Profit per product in different Sub-Categories**
+```{r}
+List_new=list()
+b=0
+for (i in Superstore) {
+  b= (Superstore$Profit)/(Superstore$Quantity)
+  List_new[[length(List_new)+1]]=b
+}
+Superstore=Superstore %>% mutate(Profit_per_product=as.integer(paste(b)))
+```
+
+```{r fig.height=8, fig.width=15}
+product_profit=Superstore %>%
+  group_by(Sub.Category) %>%
+  summarise(Total_Product_Profit= sum(Profit_per_product))%>%
+  arrange(desc(Total_Product_Profit))
+datatable(product_profit)
+```
+**Plotting Profit per product in different Sub-Categories**
+```{r fig.height=10, fig.width=13}
+ggplot(product_profit, aes(x= Sub.Category,y=Total_Product_Profit,fill= Sub.Category))+
+  geom_col(width = 0.5, alpha = 0.5)+
+  geom_point(size=9, color="black",alpha=0.07)+
+  coord_flip()+
+  geom_text(aes(x= Sub.Category,y=Total_Product_Profit,label =Total_Product_Profit))+
+  labs(x = "Sub.Category", y = "Total Product  Profit", title = "Profit per product in different Sub-Categories")+
+  theme(axis.text= element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+<br>
+<h4><b>Observations- </b></h4>
+<ul>
+  <li>Price per Product show similar trends with Phones and Chairs topping the chart.</li>
+  <li>Profit per product show similar trends with Copiers and Phones  topping the chart.</li>
+</ul>
+<br>
+
+
+<br>
+<h4><b>Shipping Models</b></h4>
+<br>
+<br>
+<h4><b>Shipping Models for Profit</b></h4>
+<br>
+```{r fig.height=5, fig.width=10}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y=Profit,fill= Ship.Mode))+
+  geom_col(width = 0.5, alpha = 0.5)+
+  facet_wrap(~Region)+
+  theme_dark()+
+  coord_flip()+
+  labs(x = "Shipping Model", y = "Product  Profit", title = "Shipping Models for Profit")+
+  theme(axis.text= element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+```{r fig.height=10, fig.width=16}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y= Profit,,fill= Ship.Mode))+
+  geom_col(width = 0.5)+
+  facet_wrap(~Category)+
+  theme_dark()+
+  labs(x = "Shipping Model", y = "Product  Profit", title = "Shipping Models for Profit")+
+  theme(axis.text= element_text(size = 12, face = "bold"), title  =  element_text(size = 16))+
+  theme(axis.text.x = element_text(angle = 90 ,size = 12, face = "bold"))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+
+```{r fig.height=16, fig.width=16}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y= Profit,,fill= Ship.Mode))+
+  geom_col(width = 0.5)+
+  facet_wrap(~Sub.Category)+
+  theme_dark()+
+  labs(x = "Shipping Model", y = "Product  Profit", title = "Shipping Models for Profit")+
+  theme(axis.text= element_text(size = 12, face = "bold"), title  =  element_text(size = 16))+
+  theme(axis.text.x = element_text(angle = 90 ,size = 12, face = "bold"))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+```{r fig.height=5, fig.width=10}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y=Profit,fill= Ship.Mode))+
+  geom_col(width = 0.5, alpha = 0.5)+
+  facet_wrap(~Segment)+
+  theme_dark()+
+  coord_flip()+
+  labs(x = "Shipping Model", y = "Product  Profit", title = "Shipping Models for Profit")+
+  theme(axis.text= element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+<br>
+<h4><b>Shipping Models for Quantity</b></h4>
+<br>
+```{r fig.height=5, fig.width=10}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y=Quantity,fill= Ship.Mode))+
+  geom_col(width = 0.5, alpha = 0.5)+
+  facet_wrap(~Region)+
+  theme_dark()+
+  coord_flip()+
+  labs(x = "Shipping Model", y = "Product  Quantity", title = "Shipping Models for Quantity")+
+  theme(axis.text= element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+```{r fig.height=7, fig.width=16}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y=Quantity,,fill= Ship.Mode))+
+  geom_col(width = 0.5)+
+  facet_wrap(~Category)+
+  theme_dark()+
+  labs(x = "Shipping Model", y = "Product  Quantity", title = "Shipping Models for Quantity")+
+  theme(axis.text= element_text(size = 12, face = "bold"), title  =  element_text(size = 16))+
+  theme(axis.text.x = element_text(angle = 90 ,size = 12, face = "bold"))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+
+```{r fig.height=16, fig.width=16}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y=Quantity,,fill= Ship.Mode))+
+  geom_col(width = 0.5)+
+  facet_wrap(~Sub.Category)+
+  theme_dark()+
+  labs(x = "Shipping Model", y = "Product  Quantity", title = "Shipping Models for Quantity")+
+  theme(axis.text= element_text(size = 12, face = "bold"), title  =  element_text(size = 16))+
+  theme(axis.text.x = element_text(angle = 90 ,size = 12, face = "bold"))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+```{r fig.height=5, fig.width=10}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y=Quantity,fill= Ship.Mode))+
+  geom_col(width = 0.5, alpha = 0.5)+
+  facet_wrap(~Segment)+
+  theme_dark()+
+  coord_flip()+
+  labs(x = "Shipping Model", y = "Product  Quantity", title = "Shipping Models for Quantity")+
+  theme(axis.text= element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+<br>
+<h4><b>Shipping Models for Sales</b></h4>
+<br>
+```{r fig.height=5, fig.width=10}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y=Sales,fill= Ship.Mode))+
+  geom_col(width = 0.5, alpha = 0.5)+
+  facet_wrap(~Region)+
+  theme_dark()+
+  coord_flip()+
+  labs(x = "Shipping Model", y = "Product  Sales", title = "Shipping Models for Sales")+
+  theme(axis.text= element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(axis.text.x = element_text(angle = 90 ,size = 12, face = "bold"))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+```{r fig.height=7, fig.width=16}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y=Sales,,fill= Ship.Mode))+
+  geom_col(width = 0.5)+
+  facet_wrap(~Category)+
+  theme_dark()+
+  labs(x = "Shipping Model", y = "Product  Sales", title = "Shipping Models for Sales")+
+  theme(axis.text= element_text(size = 12, face = "bold"), title  =  element_text(size = 16))+
+  theme(axis.text.x = element_text(angle = 90 ,size = 12, face = "bold"))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+
+```{r fig.height=16, fig.width=16}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y=Sales,,fill= Ship.Mode))+
+  geom_col(width = 0.5)+
+  facet_wrap(~Sub.Category)+
+  theme_dark()+
+  labs(x = "Shipping Model", y = "Product  Sales", title = "Shipping Models for Sales")+
+  theme(axis.text= element_text(size = 12, face = "bold"), title  =  element_text(size = 16))+
+  theme(axis.text.x = element_text(angle = 90 ,size = 12, face = "bold"))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+
+```{r fig.height=5, fig.width=10}
+Superstore %>%
+  ggplot(aes(x=Ship.Mode,y=Sales,fill= Ship.Mode))+
+  geom_col(width = 0.5, alpha = 0.5)+
+  facet_wrap(~Segment)+
+  theme_dark()+
+  coord_flip()+
+  labs(x = "Shipping Model", y = "Product  Sales", title = "Shipping Models for Sales")+
+  theme(axis.text= element_text(size = 10, face = "bold"), title  =  element_text(size = 16))+
+  theme(legend.title = element_text(size=10),legend.text = element_text(size=10),legend.position="bottom")
+```
+
+<br>
+<h4><b>Observations- </b></h4>
+<ul>
+  <li>Standard Class is the most used shipping method among all consumer segments.</li>
+  <li>Office Supplies are the most bought products and Consumer segment is the largest Segment among the three.</li>
+</ul>
+<br>
+
+<br>
+<h4><b> Sales and Profits with and without discount </b></h4>
+<h4>
+```{r}
+Superstore$DiscountedPrice= Superstore$Sales- (Superstore$Sales*Superstore$Discount)
+Superstore$Sales_Quantity= Superstore$Sales/Superstore$Quantity
+Superstore$DP_Quantity= Superstore$DiscountedPrice/Superstore$Quantity
+View(Superstore)
+```
+
+```{r}
+No_Discount=Superstore%>% 
+  filter(Discount==0.00) %>%
+  summarise(Total_Quantity= sum(Quantity)) 
+datatable(No_Discount)
+```
+
+```{r}
+Discount=Superstore%>% 
+  filter(Discount!=0.00) %>%
+  summarise(Total_Quantity= sum(Quantity)) 
+datatable(Discount)
+```
+
+```{r}
+Total_Quantity=Discount- No_Discount
+datatable(Total_Quantity)
+```
+
+<br>
+<h4><b>Observations- </b></h4>
+<ul>
+  <li>Considering sales across different categories, with and without discount,there is more sales taking place in the case with Discount, which is obvious.</li>
+</ul>
+<br>
+
+
+
